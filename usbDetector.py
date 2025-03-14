@@ -1,8 +1,10 @@
 from tkinter import messagebox
 import wmi
 import time
+import pythoncom
 
 def monitor_usb(root):
+    pythoncom.CoInitialize()
     c = wmi.WMI()
     prev_usbs = {d.DeviceID for d in c.Win32_DiskDrive() if 'USB' in d.Caption}
     while True:
