@@ -1,8 +1,9 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
 import threading
-import wmi
-import time
+
+
+from usbDetector import monitor_usb
 
 def select_file():
     file_path = filedialog.askopenfilename(filetypes=[("PDF files", "*.pdf")])
@@ -56,19 +57,6 @@ def navigation_view(root):
     tk.Button(nav_frame, text="Podpisz dokument", command=show_signing_view).pack(side=tk.LEFT, padx=10)
     tk.Button(nav_frame, text="Zweryfikuj podpis", command=show_verification_view).pack(side=tk.LEFT, padx=10)
 
-def monitor_usb():
-    c = wmi.WMI()
-    prev_usbs = {d.DeviceID for d in c.Win32_DiskDrive() if 'USB' in d.Caption}
-    while True:
-        current_usbs = {d.DeviceID for d in c.Win32_DiskDrive() if 'USB' in d.Caption}
-        added_usbs = current_usbs - prev_usbs
-        removed_usbs = prev_usbs - current_usbs
-        for device in added_usbs:
-            root.after(0, lambda d=device: messagebox.showinfo("USB", f"Podłączono urządzenie: {d}"))
-        for device in removed_usbs:
-            root.after(0, lambda d=device: messagebox.showinfo("USB", f"Odłączono urządzenie: {d}"))
-        prev_usbs = current_usbs
-        time.sleep(2)
 
 root = tk.Tk()
 root.title("BSK - Podpisywanie dokumentów")
@@ -79,7 +67,8 @@ signing_screen, entry_file, entry_pin = signing_view(root)
 verification_screen = verification_view(root)
 show_signing_view()
 
-usb_thread = threading.Thread(target=monitor_usb, daemon=True)
+usb_thread = threading.Thread(target=monitor_usb, args=(root,), daemon=True)
+
 usb_thread.start()
 
 root.mainloop()
