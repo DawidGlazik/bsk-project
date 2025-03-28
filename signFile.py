@@ -20,6 +20,7 @@ def load_key(usb_path):
             key_path = os.path.join(usb_path, files[0])
             with open(key_path, "rb") as f:
                 encrypted_pkey = f.read()
+                print("signFile",encrypted_pkey)
             messagebox.showinfo("Sukces", "Klucz prywatny został załadowany.")
         else:
             messagebox.showerror("Błąd", "Nie odnaleziono klucza prywatnego lub odnaleziono jego wiele instancji.")
@@ -28,6 +29,7 @@ def load_key(usb_path):
     except Exception as e:
         messagebox.showerror("Błąd", "Nie udało się załadować klucza prywatnego z usb.")
         return None
+
 
 
 def decrypt_key(pin):
