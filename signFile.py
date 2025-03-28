@@ -20,6 +20,7 @@ def load_key(usb_path):
             key_path = os.path.join(usb_path, files[0])
             with open(key_path, "rb") as f:
                 encrypted_pkey = f.read()
+                print("signFile",encrypted_pkey)
             messagebox.showinfo("Sukces", "Klucz prywatny został załadowany.")
         else:
             messagebox.showerror("Błąd", "Nie odnaleziono klucza prywatnego lub odnaleziono jego wiele instancji.")
@@ -28,6 +29,43 @@ def load_key(usb_path):
     except Exception as e:
         messagebox.showerror("Błąd", "Nie udało się załadować klucza prywatnego z usb.")
         return None
+
+
+def verify_signature(file_path, public_key_path):
+    try:
+        # Wczytanie klucza publicznego
+        with open(public_key_path, "rb") as f:
+            public_key = RSA.import_key(f.read())
+
+        # Odczytanie dokumentu PDF
+        reader = PdfReader(file_path)
+        metadata = reader.metadata
+
+        # Pobranie podpisu z metadanych
+        hex_signature = metadata.get("/Podpis")
+        if not hex_signature:
+            messagebox.showerror("Błąd", "Brak podpisu w pliku PDF.")
+            return False
+
+        signature = bytes.fromhex(hex_signature)
+
+        # Wygenerowanie hash pliku
+        hash = SHA256.new()
+        with open(file_path, "rb") as pdf:
+            hash.update(pdf.read())
+
+        # Weryfikacja podpisu
+        try:
+            print(public_key)
+            pkcs1_15.new(public_key).verify(hash, signature)
+            messagebox.showinfo("Sukces", "Podpis jest poprawny.")
+            return True
+        except (ValueError, TypeError):
+            messagebox.showerror("Błąd", "Podpis nie jest prawidłowy.")
+            return False
+    except Exception as e:
+        messagebox.showerror("Błąd", f"Wystąpił błąd podczas weryfikacji: {str(e)}")
+        return False
 
 
 def decrypt_key(pin):
