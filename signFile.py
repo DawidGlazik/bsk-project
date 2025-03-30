@@ -6,11 +6,12 @@ from PyPDF2 import PdfReader, PdfWriter
 from tkinter import messagebox
 import os
 
+from logHistory import add_log
 
 encrypted_pkey = None
 
 
-def load_key(usb_path):
+def load_key(usb_path, log_text):
     global encrypted_pkey
 
     try:
@@ -20,52 +21,14 @@ def load_key(usb_path):
             key_path = os.path.join(usb_path, files[0])
             with open(key_path, "rb") as f:
                 encrypted_pkey = f.read()
-                print("signFile",encrypted_pkey)
-            messagebox.showinfo("Sukces", "Klucz prywatny został załadowany.")
+                add_log(log_text, "Załadowano klucz prywatny z usb.")
         else:
-            messagebox.showerror("Błąd", "Nie odnaleziono klucza prywatnego lub odnaleziono jego wiele instancji.")
+            add_log(log_text, "Błąd: Brak klucza prywatnego na usb lub więcej niż jeden klucz.")
             return None
 
     except Exception as e:
-        messagebox.showerror("Błąd", "Nie udało się załadować klucza prywatnego z usb.")
+        add_log(log_text, "Błąd: Nie udało się załadować klucza prywatnego.")
         return None
-
-
-def verify_signature(file_path, public_key_path):
-    try:
-        # Wczytanie klucza publicznego
-        with open(public_key_path, "rb") as f:
-            public_key = RSA.import_key(f.read())
-
-        # Odczytanie dokumentu PDF
-        reader = PdfReader(file_path)
-        metadata = reader.metadata
-
-        # Pobranie podpisu z metadanych
-        hex_signature = metadata.get("/Podpis")
-        if not hex_signature:
-            messagebox.showerror("Błąd", "Brak podpisu w pliku PDF.")
-            return False
-
-        signature = bytes.fromhex(hex_signature)
-
-        # Wygenerowanie hash pliku
-        hash = SHA256.new()
-        with open(file_path, "rb") as pdf:
-            hash.update(pdf.read())
-
-        # Weryfikacja podpisu
-        try:
-            print(public_key)
-            pkcs1_15.new(public_key).verify(hash, signature)
-            messagebox.showinfo("Sukces", "Podpis jest poprawny.")
-            return True
-        except (ValueError, TypeError):
-            messagebox.showerror("Błąd", "Podpis nie jest prawidłowy.")
-            return False
-    except Exception as e:
-        messagebox.showerror("Błąd", f"Wystąpił błąd podczas weryfikacji: {str(e)}")
-        return False
 
 
 def decrypt_key(pin):
@@ -90,14 +53,23 @@ def decrypt_key(pin):
 def generate_hash(file_path):
     try:
         hash = SHA256.new()
+        reader = PdfReader(file_path)
+        writer = PdfWriter()
 
-        with open(file_path, "rb") as pdf:
+        for page in reader.pages:
+            writer.add_page(page)
+
+        temp_path = "temp_no_signature.pdf"
+        with open(temp_path, "wb") as temp_file:
+            writer.write(temp_file)
+
+        with open(temp_path, "rb") as pdf:
             data = pdf.read()
             hash.update(data)
-        return hash
 
+        os.remove(temp_path)
+        return hash
     except Exception as e:
-        messagebox.showerror("Błąd", "Nie udało się wygenerować hash'a pliku pdf.")
         return None
 
 
@@ -106,7 +78,6 @@ def create_signature(hash, decrypted_pkey):
         return pkcs1_15.new(decrypted_pkey).sign(hash)
 
     except Exception as e:
-        messagebox.showerror("Błąd", "Nie udało się podpisać pliku.")
         return None
 
 
@@ -124,9 +95,7 @@ def bond_signature_and_pdf(file_path, signature):
         with open(file_path, "wb") as signed:
             writer.write(signed)
 
-        messagebox.showinfo("Sukces", "Podpisano plik pomyślnie.")
         return file_path
 
     except Exception as e:
-        messagebox.showerror("Błąd", "Nie udało się umieścić podpisu w metadanych pliku.")
         return None

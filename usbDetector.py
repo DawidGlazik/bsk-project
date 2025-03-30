@@ -3,10 +3,11 @@ import wmi
 import time
 import pythoncom
 
+from logHistory import add_log
 from signFile import load_key
 
 
-def monitor_usb(root):
+def monitor_usb(root,log_text):
     pythoncom.CoInitialize()
     c = wmi.WMI()
     prev_usbs = {d.DeviceID for d in c.Win32_DiskDrive() if 'USB' in d.Caption}
@@ -15,7 +16,7 @@ def monitor_usb(root):
         added_usbs = current_usbs - prev_usbs
         removed_usbs = prev_usbs - current_usbs
         for device in added_usbs:
-            root.after(0, lambda d=device: messagebox.showinfo("USB", f"Podłączono urządzenie: {d}"))
+            add_log(log_text, f"Podłączono urządzenie: {device}")
 
             for drive in c.Win32_DiskDrive():
                 if drive.DeviceID == device:
@@ -29,6 +30,6 @@ def monitor_usb(root):
                                     load_key(usb_path)
                                     break
         for device in removed_usbs:
-            root.after(0, lambda d=device: messagebox.showinfo("USB", f"Odłączono urządzenie: {d}"))
+            add_log(log_text, f"Odłączono urządzenie: {device}")
         prev_usbs = current_usbs
         time.sleep(2)
