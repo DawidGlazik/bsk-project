@@ -1,17 +1,19 @@
 import tkinter as tk
 import threading
 from tkinter import filedialog
-
 import signFile
 from logHistory import log_view, add_log
 from usbDetector import *
 from signFile import *
+from verification import verify_signature
+
 
 def select_file(entry_widget):
     file_path = filedialog.askopenfilename(filetypes=[("Pliki PDF", "*.pdf")])
     if file_path:
         entry_widget.delete(0, tk.END)
         entry_widget.insert(0, file_path)
+
 
 def sign_document():
     file_path = entry_file_signing.get()
@@ -45,6 +47,7 @@ def sign_document():
 
     add_log(log_text, "Sukces: Dokument podpisany.")
 
+
 def verify_document():
     file_path = entry_file_verification.get()
     public_key_path = "F:\p.pem"
@@ -53,19 +56,22 @@ def verify_document():
         add_log(log_text, "Błąd: Brak pliku PDF lub klucza publicznego.")
         return
 
-    result = verify_signature(file_path, public_key_path)
+    result = verify_signature(file_path, public_key_path, log_text)
     if result:
         add_log(log_text, "Sukces: Podpis jest prawidłowy.")
     else:
         add_log(log_text, "Błąd: Podpis jest nieprawidłowy.")
 
+
 def show_signing_view():
     verification_screen.pack_forget()
     signing_screen.pack(pady=10, fill=tk.BOTH, expand=True)
 
+
 def show_verification_view():
     signing_screen.pack_forget()
     verification_screen.pack(pady=10, fill=tk.BOTH, expand=True)
+
 
 def signing_view(root):
     signing_screen = tk.Frame(root)
@@ -79,6 +85,7 @@ def signing_view(root):
     tk.Button(signing_screen, text="Podpisz dokument", command=sign_document).pack(pady=10)
     return signing_screen, entry_file, entry_pin
 
+
 def verification_view(root):
     verification_screen = tk.Frame(root)
     tk.Label(verification_screen, text="Plik PDF:").pack(pady=5)
@@ -88,11 +95,13 @@ def verification_view(root):
     tk.Button(verification_screen, text="Zweryfikuj podpis", command=verify_document).pack(pady=5)
     return verification_screen, entry_file
 
+
 def navigation_view(root):
     nav_frame = tk.Frame(root)
     nav_frame.pack(pady=5)
     tk.Button(nav_frame, text="Podpisz dokument", command=show_signing_view).pack(side=tk.LEFT, padx=10)
     tk.Button(nav_frame, text="Zweryfikuj podpis", command=show_verification_view).pack(side=tk.LEFT, padx=10)
+
 
 root = tk.Tk()
 root.title("BSK - Podpisywanie dokumentów")
@@ -105,7 +114,9 @@ show_signing_view()
 
 log_text = log_view(root)
 
-usb_thread = threading.Thread(target=monitor_usb, args=(root,), daemon=True)
+# bez wykyrwania usb narazie bo robiłem to na macu
+#load_key("/Users/pawelmroczek/Desktop/studia/sem6/bsk/certyfikaty", log_text)
+usb_thread = threading.Thread(target=monitor_usb, args=(root,log_text), daemon=True)
 usb_thread.start()
 
 root.mainloop()
