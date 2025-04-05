@@ -56,7 +56,7 @@ def sign_document():
 
 def verify_document():
     file_path = entry_file_verification.get()
-    public_key_path = entry_public_key.get()
+    public_key_path = entry_key.get()
 
     if not file_path or not public_key_path:
         add_log(log_text, "Błąd: Brak pliku PDF lub klucza publicznego.")
