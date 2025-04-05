@@ -27,7 +27,7 @@ def monitor_usb(root,log_text):
                             if logical_disk.DriveType == 2:
                                 usb_path = logical_disk.DeviceID
                                 if usb_path:
-                                    load_key(usb_path)
+                                    load_key(usb_path,log_text)
                                     break
         for device in removed_usbs:
             add_log(log_text, f"Odłączono urządzenie: {device}")

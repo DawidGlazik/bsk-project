@@ -3,7 +3,7 @@ import threading
 from tkinter import filedialog
 import signFile
 from logHistory import log_view, add_log
-# from usbDetector import *
+from usbDetector import *
 from signFile import *
 from verification import verify_signature
 
@@ -50,7 +50,7 @@ def sign_document():
 
 def verify_document():
     file_path = entry_file_verification.get()
-    public_key_path = "/Users/pawelmroczek/Desktop/studia/sem6/bsk/certyfikaty/test.cer"
+    public_key_path = "F:\p.pem"
 
     if not file_path or not public_key_path:
         add_log(log_text, "Błąd: Brak pliku PDF lub klucza publicznego.")
@@ -115,8 +115,8 @@ show_signing_view()
 log_text = log_view(root)
 
 # bez wykyrwania usb narazie bo robiłem to na macu
-load_key("/Users/pawelmroczek/Desktop/studia/sem6/bsk/certyfikaty", log_text)
-# usb_thread = threading.Thread(target=monitor_usb, args=(root,), daemon=True)
-# usb_thread.start()
+#load_key("/Users/pawelmroczek/Desktop/studia/sem6/bsk/certyfikaty", log_text)
+usb_thread = threading.Thread(target=monitor_usb, args=(root,log_text), daemon=True)
+usb_thread.start()
 
 root.mainloop()

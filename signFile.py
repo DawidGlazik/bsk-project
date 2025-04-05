@@ -31,6 +31,7 @@ def load_key(usb_path, log_text):
         return None
 
 
+
 def decrypt_key(pin):
     global encrypted_pkey
     try:
@@ -59,15 +60,15 @@ def generate_hash(file_path):
         for page in reader.pages:
             writer.add_page(page)
 
-        temp_path = "temp_no_signature.pdf"
-        with open(temp_path, "wb") as temp_file:
+        temporary_file = "temporary_file.pdf"
+        with open(temporary_file, "wb") as temp_file:
             writer.write(temp_file)
 
-        with open(temp_path, "rb") as pdf:
+        with open(temporary_file, "rb") as pdf:
             data = pdf.read()
             hash.update(data)
 
-        os.remove(temp_path)
+        os.remove(temporary_file)
         return hash
     except Exception as e:
         return None
