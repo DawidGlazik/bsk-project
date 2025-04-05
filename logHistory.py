@@ -1,11 +1,16 @@
 import tkinter as tk
 from tkinter.scrolledtext import ScrolledText
 
+import tkinter as tk
+from datetime import datetime
 
-def add_log(log_text,message):
+
+def add_log(log_text, message):
     log_text.config(state=tk.NORMAL)
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    message_with_timestamp = f"[{timestamp}] {message}"
 
-    log_text.insert(tk.END, message + "\n")
+    log_text.insert(tk.END, message_with_timestamp + "\n")
     log_text.config(state=tk.DISABLED)
     log_text.yview(tk.END)
 

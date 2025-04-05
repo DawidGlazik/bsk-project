@@ -15,6 +15,12 @@ def select_file(entry_widget):
         entry_widget.insert(0, file_path)
 
 
+def select_public_key(entry_widget):
+    file_path = filedialog.askopenfilename(filetypes=[("Pliki PEM", "*.pem")])
+    if file_path:
+        entry_widget.delete(0, tk.END)
+        entry_widget.insert(0, file_path)
+
 def sign_document():
     file_path = entry_file_signing.get()
     pin = entry_pin.get()
@@ -50,7 +56,7 @@ def sign_document():
 
 def verify_document():
     file_path = entry_file_verification.get()
-    public_key_path = "F:\p.pem"
+    public_key_path = entry_public_key.get()
 
     if not file_path or not public_key_path:
         add_log(log_text, "Błąd: Brak pliku PDF lub klucza publicznego.")
@@ -92,8 +98,14 @@ def verification_view(root):
     entry_file = tk.Entry(verification_screen, width=40)
     entry_file.pack()
     tk.Button(verification_screen, text="Wybierz plik", command=lambda: select_file(entry_file)).pack(pady=5)
+
+    tk.Label(verification_screen, text="Klucz publiczny:").pack(pady=5)
+    entry_key = tk.Entry(verification_screen, width=40)
+    entry_key.pack()
+    tk.Button(verification_screen, text="Wybierz certyfikat", command=lambda: select_public_key(entry_key)).pack(pady=5)
+
     tk.Button(verification_screen, text="Zweryfikuj podpis", command=verify_document).pack(pady=5)
-    return verification_screen, entry_file
+    return verification_screen, entry_file, entry_key
 
 
 def navigation_view(root):
@@ -109,14 +121,11 @@ root.geometry("450x500")
 
 navigation_view(root)
 signing_screen, entry_file_signing, entry_pin = signing_view(root)
-verification_screen, entry_file_verification = verification_view(root)
+verification_screen, entry_file_verification, entry_key = verification_view(root)
 show_signing_view()
 
 log_text = log_view(root)
-
-# bez wykyrwania usb narazie bo robiłem to na macu
-#load_key("/Users/pawelmroczek/Desktop/studia/sem6/bsk/certyfikaty", log_text)
-usb_thread = threading.Thread(target=monitor_usb, args=(root,log_text), daemon=True)
+usb_thread = threading.Thread(target=monitor_usb, args=(root, log_text), daemon=True)
 usb_thread.start()
 
 root.mainloop()
