@@ -7,6 +7,10 @@ import os
 
 
 def save_key(pub_key):
+    """
+    @brief Zapisuje klucz publiczny do pliku PEM.
+    @param pub_key: Klucz publiczny do zapisania.
+    """
     path = filedialog.asksaveasfilename(defaultextension=".pem", title="Zapisz klucz publiczny")
     if path:
         with open(path, 'wb') as f:
@@ -16,6 +20,11 @@ def save_key(pub_key):
 
 
 def save_on_usb(aes, priv_key):
+    """
+    @brief Zapisuje zaszyfrowany klucz prywatny na USB.
+    @param aes: Klucz AES do szyfrowania.
+    @param priv_key: Klucz prywatny do zapisania.
+    """
     secret = AES.new(aes, AES.MODE_EAX)
     keyToText, tag = secret.encrypt_and_digest(priv_key)
 
@@ -30,6 +39,11 @@ def save_on_usb(aes, priv_key):
 
 
 def gen_keys():
+    """
+    @brief Generuje parę kluczy RSA i zapisuje je.
+    @details Funkcja pobiera PIN z pola tekstowego, generuje klucze RSA, 
+    szyfruje klucz prywatny, zapisuje klucz publiczny lokalnie oraz prywatny na USB.
+    """
     pin = pin_entry.get()
     if not pin:
         messagebox.showerror("Błąd", "Nie podano PINu.")

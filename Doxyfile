@@ -1,0 +1,8 @@
+PROJECT_NAME           = "BSK Projekt"
+OUTPUT_DIRECTORY       = docs
+INPUT                  = ./
+FILE_PATTERNS          = *.py
+RECURSIVE              = YES
+EXTRACT_ALL            = YES
+OPTIMIZE_OUTPUT_JAVA   = YES   
+GENERATE_LATEX         = NO    

@@ -8,8 +8,12 @@ from PyPDF2 import PdfReader
 from logHistory import add_log
 from signFile import generate_hash
 
-
 def extract_signature(file_path):
+    """
+    @brief Wyodrębnia podpis z metadanych pliku PDF.
+    @param file_path: Ścieżka do pliku PDF.
+    @return Podpis w postaci bajtów, jeśli istnieje; inaczej None.
+    """
     try:
         reader = PdfReader(file_path)
         metadata = reader.metadata
@@ -22,8 +26,14 @@ def extract_signature(file_path):
     except Exception as e:
         return None
 
-
-def verify_signature(file_path, public_key_path,log_text):
+def verify_signature(file_path, public_key_path, log_text):
+    """
+    @brief Weryfikuje podpis cyfrowy dokumentu PDF.
+    @param file_path: Ścieżka do pliku PDF.
+    @param public_key_path: Ścieżka do klucza publicznego.
+    @param log_text: Widget tekstowy logów do wyświetlania komunikatów.
+    @return True Jeśli podpis jest poprawny. False w przeciwnym razie.
+    """
     try:
         signature = extract_signature(file_path)
         if signature is None:

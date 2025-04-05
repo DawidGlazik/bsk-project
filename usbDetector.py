@@ -7,7 +7,11 @@ from logHistory import add_log
 from signFile import load_key
 
 
-def monitor_usb(root,log_text):
+def monitor_usb(log_text):
+    """
+    @brief Monitoruje podłączenie i odłączenie urządzeń USB.
+    @param log_text: Widget tekstowy logów do wyświetlania komunikatów.
+    """
     pythoncom.CoInitialize()
     c = wmi.WMI()
     prev_usbs = {d.DeviceID for d in c.Win32_DiskDrive() if 'USB' in d.Caption}
