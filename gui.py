@@ -9,6 +9,10 @@ from verification import verify_signature
 
 
 def select_file(entry_widget):
+    """
+    @brief Otwiera okno do wyboru PDFa i wpisuje ścieżkę pliku do pola tekstowego.
+    @param entry_widget: Entry, do którego zostanie wpisana ścieżka do pliku.
+    """
     file_path = filedialog.askopenfilename(filetypes=[("Pliki PDF", "*.pdf")])
     if file_path:
         entry_widget.delete(0, tk.END)
@@ -16,12 +20,20 @@ def select_file(entry_widget):
 
 
 def select_public_key(entry_widget):
+    """
+    @brief Otwiera okno do wyboru pliku PEM i wpisuje ścieżkę pliku do pola tekstowego.
+    @param entry_widget: Entry, do którego zostanie wpisana ścieżka do pliku.
+    """
     file_path = filedialog.askopenfilename(filetypes=[("Pliki PEM", "*.pem")])
     if file_path:
         entry_widget.delete(0, tk.END)
         entry_widget.insert(0, file_path)
 
 def sign_document():
+    """
+    @brief Podpisuje dokument PDF przy użyciu klucza prywatnego. Waliduje danych wejściowe i dodaje do historii zdarzeń wynik podpisywania.
+    @details Funkcja odczytuje ścieżkę do pliku PDF i PIN z pól tekstowych, odszyfrowuje klucz prywatny, generuje skrót pliku, tworzy podpis i dołącza go do pliku PDF.
+    """
     file_path = entry_file_signing.get()
     pin = entry_pin.get()
     if not file_path or not pin:
@@ -55,6 +67,9 @@ def sign_document():
 
 
 def verify_document():
+    """
+    @brief Weryfikuje podpisany dokument PDF przy użyciu klucza publicznego. Waliduje dane wejściowe i dodaje do historii zdarzeń wynik weryfikacji.
+    """
     file_path = entry_file_verification.get()
     public_key_path = entry_key.get()
 
@@ -70,16 +85,26 @@ def verify_document():
 
 
 def show_signing_view():
+    """
+    @brief Ukrywa ekran weryfikacji i pokazuje ekran podpisywania.
+    """
     verification_screen.pack_forget()
     signing_screen.pack(pady=10, fill=tk.BOTH, expand=True)
 
 
 def show_verification_view():
+    """
+    @brief Ukrywa ekran podpisywania i pokazuje ekran weryfikacji.
+    """
     signing_screen.pack_forget()
     verification_screen.pack(pady=10, fill=tk.BOTH, expand=True)
 
 
 def signing_view(root):
+    """
+    @brief Tworzy widok podpisywania dokumentu z polami do wprowadzenia PDFa i PIN-u.
+    @param root: Główne okno aplikacji.
+    """
     signing_screen = tk.Frame(root)
     tk.Label(signing_screen, text="Plik PDF:").pack(pady=5)
     entry_file = tk.Entry(signing_screen, width=40)
@@ -93,6 +118,10 @@ def signing_view(root):
 
 
 def verification_view(root):
+    """
+    @brief Tworzy widok weryfikacji podpisu z polami do wprowadzenia PDFa i klucza publicznego.
+    @param root: Główne okno aplikacji.
+    """
     verification_screen = tk.Frame(root)
     tk.Label(verification_screen, text="Plik PDF:").pack(pady=5)
     entry_file = tk.Entry(verification_screen, width=40)
@@ -109,6 +138,10 @@ def verification_view(root):
 
 
 def navigation_view(root):
+    """
+    @brief Tworzy widok nawigacji z przyciskami do przełączania między ekranem podpisywania a weryfikacji.
+    @param root: Główne okno aplikacji.
+    """
     nav_frame = tk.Frame(root)
     nav_frame.pack(pady=5)
     tk.Button(nav_frame, text="Podpisz dokument", command=show_signing_view).pack(side=tk.LEFT, padx=10)

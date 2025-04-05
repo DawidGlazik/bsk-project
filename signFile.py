@@ -10,8 +10,13 @@ from logHistory import add_log
 
 encrypted_pkey = None
 
-
 def load_key(usb_path, log_text):
+    """
+    @brief Ładuje klucz prywatny z urządzenia USB.
+    @param usb_path: Ścieżka do USB.
+    @param log_text: Obiekt tekstowy do logowania operacji.
+    @return None Jeśli wystąpił błąd.
+    """
     global encrypted_pkey
 
     try:
@@ -30,9 +35,12 @@ def load_key(usb_path, log_text):
         add_log(log_text, "Błąd: Nie udało się załadować klucza prywatnego.")
         return None
 
-
-
 def decrypt_key(pin):
+    """
+    @brief Odszyfrowuje klucz prywatny przy użyciu podanego PINu.
+    @param pin: kod pin klucza.
+    @return Klucz RSA jeśli udało się odszyfrować, w przeciwnym razie None.
+    """
     global encrypted_pkey
     try:
         aes = SHA256.new(pin.encode()).digest()
@@ -50,8 +58,12 @@ def decrypt_key(pin):
         messagebox.showerror("Błąd", "Nie udało się odszyfrować klucza prywatnego.")
         return None
 
-
 def generate_hash(file_path):
+    """
+    @brief Generuje skrót SHA-256 z pliku PDF.
+    @param file_path Ścieżka do pliku PDF.
+    @return Obiekt skrótu SHA256 lub None, jeśli wystąpił błąd.
+    """
     try:
         hash = SHA256.new()
         reader = PdfReader(file_path)
@@ -73,16 +85,25 @@ def generate_hash(file_path):
     except Exception as e:
         return None
 
-
 def create_signature(hash, decrypted_pkey):
+    """
+    @brief Tworzy podpis cyfrowy na podstawie skrótu i odszyfrowanego klucza prywatnego.
+    @param hash: Skrót SHA256 wygenerowany z pliku.
+    @param decrypted_pkey: Odszyfrowany klucz RSA.
+    @return Podpis cyfrowy w formie bajtów lub None, jeśli wystąpił błąd.
+    """
     try:
         return pkcs1_15.new(decrypted_pkey).sign(hash)
-
     except Exception as e:
         return None
 
-
 def bond_signature_and_pdf(file_path, signature):
+    """
+    @brief Dodaje podpis cyfrowy do metadanych pliku PDF.
+    @param file_path: Ścieżka do pliku PDF.
+    @param signature: Podpis cyfrowy w postaci bajtów.
+    @return Ścieżka do podpisanego pliku lub None, jeśli wystąpił błąd.
+    """
     try:
         reader = PdfReader(file_path)
         writer = PdfWriter()
@@ -100,3 +121,4 @@ def bond_signature_and_pdf(file_path, signature):
 
     except Exception as e:
         return None
+ 
