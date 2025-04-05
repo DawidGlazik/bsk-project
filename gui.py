@@ -31,7 +31,7 @@ def select_public_key(entry_widget):
 
 def sign_document():
     """
-    @brief Podpisuje dokument PDF przy użyciu klucza prywatnego. Waliduje danych wejściowe i dodaje do historii zdarzeń wynik podpisywania.
+    @brief Podpisuje dokument PDF przy użyciu klucza prywatnego. Waliduje dane wejściowe i dodaje do historii zdarzeń wynik podpisywania.
     @details Funkcja odczytuje ścieżkę do pliku PDF i PIN z pól tekstowych, odszyfrowuje klucz prywatny, generuje skrót pliku, tworzy podpis i dołącza go do pliku PDF.
     """
     file_path = entry_file_signing.get()
