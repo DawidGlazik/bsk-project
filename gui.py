@@ -159,7 +159,7 @@ show_signing_view()
 
 log_text = log_view(root)
 
-usb_thread = threading.Thread(target=monitor_usb, args=(root, log_text), daemon=True)
+usb_thread = threading.Thread(target=monitor_usb, args=(log_text,), daemon=True)
 usb_thread.start()
 
 root.mainloop()
